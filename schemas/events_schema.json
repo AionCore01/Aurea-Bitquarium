@@ -1,0 +1,93 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "schema_version": "1.0.0",
+ "title": "AIÓN-Orden Events Schema",
+ "oneOf": [
+   { "$ref": "#/$defs/policy_event" },
+   { "$ref": "#/$defs/hitl_event" },
+   { "$ref": "#/$defs/calibration_report_ref" }
+ ],
+ "$defs": {
+   "policy_event": {
+     "type": "object",
+     "properties": {
+       "event_type": { "const": "policy_event" },
+       "event_id": { "type": "string", "format": "uuid" },
+       "timestamp_iso": { "type": "string", "format": "date-time" },
+       "severity": { "type": "string", "enum": ["INFO","ALTA","CRITICO"] },
+       "detected_by": { "type": "string", "enum": ["guardian_j","observer","human_node"] },
+       "context": {
+         "type": "object",
+         "properties": {
+           "run_id": { "type": "string" },
+           "component": { "type": "string" },
+           "layer": { "type": "string", "enum": ["I","G","S","H","E","D","M","X"] }
+         }
+       },
+       "policy_change": {
+         "type": "object",
+         "required": ["requires_level1_change","policy_id_before","policy_id_after","diff_hash","root_cause_id"],
+         "properties": {
+           "requires_level1_change": { "type": "boolean" },
+           "policy_id_before": { "type": "string" },
+           "policy_id_after": { "type": "string" },
+           "diff_hash": { "type": "string" },
+           "root_cause_id": { "type": "string" },
+           "justification": { "type": "string" }
+         }
+       },
+       "governance": {
+         "type": "object",
+         "required": ["capa_m_council_review_required","council_review_status"],
+         "properties": {
+           "capa_m_council_review_required": { "type": "boolean" },
+           "council_review_status": { "type": "string", "enum": ["PENDING","APPROVED","REJECTED"] },
+           "council_acta_id": { "type": "string" }
+         }
+       },
+       "links": {
+         "type": "object",
+         "required": ["inputs_hash","outputs_hash","merkle_proof_url"],
+         "properties": {
+           "inputs_hash": { "type": "string" },
+           "outputs_hash": { "type": "string" },
+           "merkle_proof_url": { "type": "string" },
+           "adr_ref": { "type": "string" },
+           "checklist_ref": { "type": "string" }
+         }
+       },
+       "controls_mapping": { "type": "array", "items": { "type": "string" } }
+     },
+     "required": ["event_type","event_id","timestamp_iso","severity","detected_by","policy_change","governance","links"]
+   },
+   "hitl_event": {
+     "type": "object",
+     "properties": {
+       "event_type": { "const": "hitl_event" },
+       "event_id": { "type": "string", "format": "uuid" },
+       "timestamp_iso": { "type": "string", "format": "date-time" },
+       "human_id": { "type": "string" },
+       "decision_id": { "type": "string" },
+       "domain": { "type": "string" },
+       "gaze_latency_ms": { "type": "number", "minimum": 0 },
+       "eye_tracking_hz": { "type": "number", "minimum": 1 },
+       "validity": { "type": "string", "enum": ["valid","tolerated","invalid"] },
+       "policy_ref": { "type": "string" }
+     },
+     "required": ["event_type","event_id","timestamp_iso","human_id","decision_id","gaze_latency_ms","eye_tracking_hz","validity"]
+   },
+   "calibration_report_ref": {
+     "type": "object",
+     "properties": {
+       "event_type": { "const": "calibration_report_ref" },
+       "report_id": { "type": "string" },
+       "timestamp_iso": { "type": "string", "format": "date-time" },
+       "agent_level": { "type": "integer", "enum": [3] },
+       "kwh_error_delta": { "type": "number", "minimum": 0 },
+       "signed_by": { "type": "string" },
+       "artifact_url": { "type": "string" }
+     },
+     "required": ["event_type","report_id","timestamp_iso","agent_level","kwh_error_delta","signed_by"]
+   }
+ }
+}

@@ -1,0 +1,20 @@
+kpi5:
+ default:
+   ideal_min_ms: 60
+   target_ms: 150
+   hard_max_ms: 250
+   min_hz: 60
+   max_hz: 250
+ domains:
+   critical_decision:
+     target_ms: 150
+     hard_max_ms: 250
+   training_mode:
+     target_ms: 180
+     hard_max_ms: 280
+   surgical_assist:
+     target_ms: 120
+     hard_max_ms: 180
+rules:
+ hitl_validity:
+   tolerated_requires_second_confirm: true

@@ -1,0 +1,2 @@
+# Ignorar la carpeta de herramientas (dependencias)
+node_modules/

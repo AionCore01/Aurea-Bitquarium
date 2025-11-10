@@ -1,114 +1,141 @@
 // tests/compliance.test.ts
-// --- Simulacro de importaciones ---
-// En un proyecto real, esto importaría 'assert', 'fs', 'js-yaml', etc.
-// Por ahora, definimos funciones falsas para que el test tenga estructura.
-const assert = {
-  equal: (a: any, b: any) => { if (a !== b) throw new Error(`Assert failed: ${a} !== ${b}`); },
-  ok: (a: any, msg?: string) => { if (!a) throw new Error(`Assert failed: ${msg || 'not ok'}`); }
-};
-const console = { log: (msg: string) => {} }; // Simulación
+import { describe, it, expect } from '@jest/globals';
+import * as fs from 'fs';
+import * as path from 'path';
+import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
+import * as yaml from 'js-yaml';
 
-// --- Simulacro de carga de datos (Utils) ---
-// Estas funciones simulan leer los archivos JSON y YAML
-const loadLatestPolicyEvent = (): any => {
-  console.log("Simulando carga de 'policy_event'...");
-  // Simula un evento CRITICO que SÍ fue aprobado
-  return {
-    event_type: "policy_event",
-    severity: "CRITICO",
-    policy_change: { requires_level1_change: true },
-    governance: {
-      capa_m_council_review_required: true,
-      council_review_status: "APPROVED",
-      council_acta_id: "ACTA-2025-11-09-001"
-    }
-  };
-};
+// --- 1. Cargar Configuraciones y Esquemas ---
 
-const loadHitlForDecision = (domain: string): any => {
-  console.log(`Simulando carga de 'hitl_event' para dominio: ${domain}...`);
-  // Simula un evento HITL válido
-  return {
-    event_type: "hitl_event",
-    domain: domain,
-    gaze_latency_ms: 110,
-    eye_tracking_hz: 120,
-    validity: "valid"
-  };
-};
+// Cargamos el Esquema de Evidencia (para AJV)
+const schemaPath = path.resolve(__dirname, '../schemas/events_schema.json');
+const schemaFile = fs.readFileSync(schemaPath, 'utf8');
+const eventsSchema = JSON.parse(schemaFile);
 
-const loadPolicyEngineKPI5 = (domain: string): any => {
-  console.log(`Simulando carga de 'policy_engine.yaml' para KPI-5...`);
-  // Simula la config de 'surgical_assist'
-  if (domain === "surgical_assist") {
-    return { target_ms: 120, hard_max_ms: 180, min_hz: 60, max_hz: 250 };
-  }
-  // Default
-  return { target_ms: 150, hard_max_ms: 250, min_hz: 60, max_hz: 250 };
-};
+// Cargamos las Políticas de Umbrales (KPI-5)
+const policyPath = path.resolve(__dirname, '../config/policy_engine.yaml');
+const policyFile = fs.readFileSync(policyPath, 'utf8');
+const policyEngine = yaml.load(policyFile) as any; // Convertimos YAML a objeto
 
-const loadCalibrationReport = (): any => {
-  console.log("Simulando carga de 'calibration_report_ref'...");
-  // Simula un reporte válido y vigente
-  return {
-    event_type: "calibration_report_ref",
-    agent_level: 3,
-    kwh_error_delta: 0.05,
-    signed_by: "Agent_N3_ID_778",
-    timestamp_iso: new Date().toISOString() // Simula que es de hoy (vigente)
-  };
+// Configuramos el Validador AJV
+const ajv = new Ajv();
+addFormats(ajv); // Añadir formatos como 'date-time' y 'uuid'
+const validatePolicyEvent = ajv.compile(eventsSchema.$defs.policy_event);
+const validateHitlEvent = ajv.compile(eventsSchema.$defs.hitl_event);
+const validateCalibrationReport = ajv.compile(eventsSchema.$defs.calibration_report_ref);
+
+// --- 2. Simulación de "Artefactos de Evidencia" ---
+// En un pipeline real, leeríamos estos archivos generados por el 'run'.
+// Por ahora, creamos objetos de prueba que *deberían* pasar la validación.
+
+const mockPolicyEvent_CRITICO_Aprobado = {
+ event_type: "policy_event",
+ event_id: "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890",
+ timestamp_iso: new Date().toISOString(),
+ severity: "CRITICO",
+ detected_by: "guardian_j",
+ policy_change: {
+   requires_level1_change: true,
+   policy_id_before: "POL-001@v1",
+   policy_id_after: "POL-001@v2",
+   diff_hash: "abc...",
+   root_cause_id: "RC-123"
+ },
+ governance: {
+   capa_m_council_review_required: true,
+   council_review_status: "APPROVED",
+   council_acta_id: "ACTA-2025-11-10-001"
+ },
+ links: {
+   inputs_hash: "def...",
+   outputs_hash: "ghi...",
+   merkle_proof_url: "merkle/proof.json"
+ }
 };
 
-const isFresh = (isoDate: string, maxDays: number): boolean => {
-  const reportDate = new Date(isoDate);
-  const today = new Date();
-  const diffTime = Math.abs(today.getTime() - reportDate.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays <= maxDays;
+const mockHitlEvent_Valido = {
+ event_type: "hitl_event",
+ event_id: "b2c3d4e5-f6a7-8901-b2c3-d4e5f6a78901",
+ timestamp_iso: new Date().toISOString(),
+ human_id: "HumanNode_01",
+ decision_id: "DEC-456",
+ domain: "surgical_assist", // Usamos el dominio estricto
+ gaze_latency_ms: 115, // Pasa (target 120ms)
+ eye_tracking_hz: 100, // Pasa (rango 60-250Hz)
+ validity: "valid"
 };
 
-// --- Definición de los Tests ---
-
-const test = (name: string, fn: () => void) => {
-  try {
-    fn();
-    console.log(`[PASS] ${name}`);
-  } catch (error: any) {
-    console.log(`[FAIL] ${name}: ${error.message}`);
-  }
+const mockCalibrationReport_Vigente = {
+ event_type: "calibration_report_ref",
+ report_id: "CAL-789",
+ timestamp_iso: new Date().toISOString(), // Vigente (hoy)
+ agent_level: 3,
+ kwh_error_delta: 0.05,
+ signed_by: "Agent_N3_ID_778",
+ artifact_url: "artifacts/cal-789.pdf"
 };
 
-// --- Ejecución de los Tests de Compliance ---
+// --- 3. Ejecución de los Tests de Compliance (El Auditor) ---
 
-console.log("--- Iniciando Auditor de Coherencia (Tests) ---");
+describe('Auditor de Coherencia AIÓN-Orden (ISO)', () => {
 
-// C-S3 — Consejo obligatorio para CRITICO + L1
-test("C-S3 council approval required for CRITICO L1 changes", () => {
-  const ev = loadLatestPolicyEvent();
-  if (ev && ev.severity === "CRITICO" && ev.policy_change?.requires_level1_change) {
-    assert.equal(ev.governance?.capa_m_council_review_required, true);
-    assert.equal(ev.governance?.council_review_status, "APPROVED");
-    assert.ok((ev.governance?.council_acta_id || "").startsWith("ACTA-"), "Falta ID de Acta del Consejo");
-  }
+ describe('C-S3: Gobernanza (ISO 9004 / 38500)', () => {
+   it('debe validar el esquema de policy_event', () => {
+     const valid = validatePolicyEvent(mockPolicyEvent_CRITICO_Aprobado);
+     if (!valid) console.error(validatePolicyEvent.errors);
+     expect(valid).toBe(true);
+   });
+
+   it('debe requerir aprobación del Consejo (acta) si es CRITICO y Nivel 1', () => {
+     const ev = mockPolicyEvent_CRITICO_Aprobado;
+     if (ev.severity === "CRITICO" && ev.policy_change.requires_level1_change) {
+       expect(ev.governance.capa_m_council_review_required).toBe(true);
+       expect(ev.governance.council_review_status).toBe("APPROVED");
+       expect(ev.governance.council_acta_id).toContain("ACTA-");
+     }
+   });
+ });
+
+ describe('C-A1: HITL Válido (ISO 42001)', () => {
+   it('debe validar el esquema de hitl_event', () => {
+     const valid = validateHitlEvent(mockHitlEvent_Valido);
+     if (!valid) console.error(validateHitlEvent.errors);
+     expect(valid).toBe(true);
+   });
+
+   it('debe cumplir con los umbrales KPI-5 del policy_engine.yaml', () => {
+     const ev = mockHitlEvent_Valido;
+     const cfg = policyEngine.kpi5.domains[ev.domain] || policyEngine.kpi5.default;
+
+     expect(ev.gaze_latency_ms).toBeLessThanOrEqual(cfg.target_ms);
+     expect(ev.eye_tracking_hz).toBeGreaterThanOrEqual(cfg.min_hz);
+     expect(ev.eye_tracking_hz).toBeLessThanOrEqual(cfg.max_hz);
+     expect(ev.validity).toBe("valid");
+   });
+ });
+
+ describe('C-E3: Calibración Sensores (ISO 50001)', () => {
+   const isFresh = (isoDate: string, maxDays: number): boolean => {
+     const reportDate = new Date(isoDate);
+     const today = new Date();
+     const diffTime = Math.abs(today.getTime() - reportDate.getTime());
+     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+     return diffDays <= maxDays;
+   };
+
+   it('debe validar el esquema de calibration_report_ref', () => {
+     const valid = validateCalibrationReport(mockCalibrationReport_Vigente);
+     if (!valid) console.error(validateCalibrationReport.errors);
+     expect(valid).toBe(true);
+   });
+
+   it('debe ser de Nivel 3, estar firmado y estar vigente (<= 90 días)', () => {
+     const rep = mockCalibrationReport_Vigente;
+     expect(rep.agent_level).toBe(3);
+     expect(rep.signed_by).toBeTruthy(); // Verifica que no esté vacío o nulo
+     expect(isFresh(rep.timestamp_iso, 90)).toBe(true);
+   });
+ });
+
 });
-
-// C-A1 — HITL válido vs KPI-5
-test("C-A1 HITL validity against KPI-5", () => {
-  const hitl = loadHitlForDecision("surgical_assist"); // Usamos un dominio de prueba
-  const cfg = loadPolicyEngineKPI5(hitl.domain);
-
-  assert.ok(hitl.eye_tracking_hz >= cfg.min_hz && hitl.eye_tracking_hz <= cfg.max_hz, "Frecuencia (Hz) fuera de rango");
-  assert.ok(hitl.gaze_latency_ms <= cfg.target_ms, "Latencia (ms) supera el objetivo");
-  assert.equal(hitl.validity, "valid", "El evento no fue marcado como válido");
-});
-
-// C-E3 — Calibración L3 vigente
-test("C-E3 calibration report present, signed and fresh", () => {
-  const rep = loadCalibrationReport();
-  assert.equal(rep.agent_level, 3, "Reporte no es de Nivel 3");
-  assert.ok(rep.kwh_error_delta >= 0, "Delta de error negativo");
-  assert.ok(!!rep.signed_by, "Reporte no está firmado");
-  assert.ok(isFresh(rep.timestamp_iso, 90), "Reporte de calibración está vencido (>90 días)");
-});
-
-console.log("--- Auditor de Coherencia (Tests) finalizado ---");

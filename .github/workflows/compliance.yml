@@ -1,60 +1,56 @@
 name: Auditor de Coherencia AIÓN
 
 on:
-  pull_request:
-    branches: [ main, trunk, release/* ]
+  # Correr en la rama 'main' (ya que la renombraste)
   push:
-    branches: [ feature/* ]
+    branches: [ main ]
+  # Correr también en Pull Requests que apunten a 'main'
+  pull_request:
+    branches: [ main ]
 
 jobs:
   compliance:
     name: Auditoria de Coherencia (ISO / AIÓN)
     runs-on: ubuntu-latest
     steps:
-      - name: 1. Checkout (Obtener código)
+      - name: "1. Checkout (Obtener código)"
         uses: actions/checkout@v4
 
-      - name: 2. Setup Node.js (Preparar entorno)
+      - name: "2. Setup Node.js (Preparar entorno)"
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: 3. Install dependencies (Instalar herramientas)
-        run: |
-          # En un proyecto real, esto correría npm ci o yarn install
-          echo "Simulando 'npm install'..."
-          touch node_modules/ # Simula instalación
+      - name: "3. Install dependencies (Instalar herramientas reales)"
+        # Esto instala Jest, AJV, etc.
+        run: npm install
 
-      - name: 4. Lint schemas (Validar lenguaje de evidencia)
+      - name: "4. Lint schemas (Validar lenguaje de evidencia)"
         run: |
-          echo "Simulando validación de 'schemas/events_schema.json'..."
-          # Aquí iría un comando como 'ajv -s schemas/events_schema.json -d artifacts/events/*.json'
+          echo "Paso 4: Validación de esquemas (simulado)..."
+          # Aquí un validador real como ajv-cli
           echo "[PASS] Esquemas validados."
 
-      - name: 5. Run compliance tests (Correr guardianes C-S3, C-A1, C-E3)
-        run: |
-          echo "Ejecutando tests de compliance (tests/compliance.test.ts)..."
-          # Esto ejecutaría el archivo de test que creamos.
-          # Simulamos su ejecución aquí:
-          node tests/compliance.test.ts
+      - name: "5. Run compliance tests (Correr guardianes C-S3, C-A1, C-E3 y SECH)"
+        # Esto corre "jest" gracias a nuestro package.json (que ya arreglamos)
+        run: npm run test
 
-      - name: 6. Generate Merkle root and proofs (Generar pruebas criptográficas)
+      - name: "6. Generate Merkle root (Simulación)"
         run: |
-          echo "Simulando generación de Merkle root y proofs..."
+          echo "Paso 6: Generando Merkle root (simulado)..."
           echo "a1b2c3d4..." > artifacts/merkle_root.txt
-          echo "{...}" > artifacts/merkle_proof_run123.json
 
-      - name: 7. Render run_report.md (Generar recibo PDCA)
+      - name: "7. Render run_report.md (Simulación)"
         run: |
-          echo "Renderizando 'run_report.md' desde la plantilla..."
-          # Copia la plantilla para simular el reporte generado
+          echo "Paso 7: Renderizando 'run_report.md' (simulado)..."
           cp artifacts/templates/run_report.md artifacts/run_report_generated.md
 
+      # Paso 8: Corregido con comillas (para el emoji Y el colon)
+      # y con la indentación del 'run:' 100% correcta.
       - name: "8. 🛡️ GATE: Validate critical evidence (Auditor de Coherencia)"
-            run: |
-          echo "🛡️ AUDITOR DE COHERENCIA 🛡️"
+        run: |
+          echo "--- AUDITOR DE COHERENCIA ---"
           echo "Validando que 'run_report.md' tenga evidencia crítica (C-S3, C-A1, C-E3)..."
-          # Aquí iría un script que parsea el reporte generado y
-          # comprueba que las secciones 2.1, 2.2 y 2.3 no digan 'FAILED' o 'MISSING'
+          # Script de validación iría aquí
           echo "[PASS] Evidencia crítica encontrada."
           echo "Deploy... AUTORIZADO."

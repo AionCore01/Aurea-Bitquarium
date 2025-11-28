@@ -35,8 +35,8 @@ jobs:
           echo "Paso 7: Renderizando 'run_report.md' (simulado)..."
           mkdir -p artifacts
           cp artifacts/templates/run_report.md artifacts/run_report_generated.md
-      - name: "8. 🛡️ GATE: Validate critical evidence (Auditor de Coherencia)"
-        run: |
+      - - name: '8. 🛡️ GATE: Validate critical evidence (Auditor de Coherencia)'
+        run: |-
           echo "--- AUDITOR DE COHERENCIA ---"
           echo "Validando que 'run_report.md' tenga evidencia crítica (C-S3, C-A1, C-E3)..."
           echo "[PASS] Evidencia crítica encontrada."

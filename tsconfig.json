@@ -4,10 +4,12 @@
    "module": "commonjs",
    "target": "es2017",
    "strict": true,
-   "types": ["jest", "node"]
+   "types": ["jest", "node"],
+   "moduleResolution": "node"
  },
  "include": [
-   "tests/**/*.ts"
+   "tests/**/*.ts",
+   "src/**/*.ts"
  ],
  "exclude": [
    "node_modules"

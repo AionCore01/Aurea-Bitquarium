@@ -12,6 +12,7 @@ import { RiskOfficer } from './Service/RiskOfficer'; // Added import
 import { HistoricalLedger } from './Service/HistoricalLedger'; // 💥 NUEVA IMPORTACIÓN
 import { EventLogger } from './Events/EventLogger';
 import { NotionConnector } from './Adapters/NotionConnector';
+import { generateDataAureaReport } from './data_aurea_report';
 
 const logger = EventLogger.getInstance(); 
 
@@ -84,6 +85,9 @@ async function startAionAudit() {
     console.log('\n--- SIMULACIÓN PROFESIONAL FINALIZADA ---');
     console.log(`Ciclos de Trabajo Auditados por Notion: ${completedCycles}`);
     console.log(`Total de Eventos Auditados en Ledger: ${logger.getAllEvents().length}`);
+
+    // 4. Generar el Reporte de Tendencia Aurea
+    generateDataAureaReport(historicalLedger); // Pasa la instancia de tu ledger aquí
 }
 
 startAionAudit();

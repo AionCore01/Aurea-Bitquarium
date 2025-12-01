@@ -29,4 +29,15 @@ export class HistoricalLedger {
     public getRecords(): HistoricalRecord[] {
         return this.records;
     }
+
+    /**
+     * Recupera el historial completo de records para análisis.
+     */
+    public getAllRecords(): HistoricalRecord[] {
+        // Asumiendo que guardas la data en un array llamado 'records'
+        // Si tu variable se llama diferente, ajústala aquí.
+        // Si no tienes una variable 'records', debes crearla: private records: HistoricalRecord[] = [];
+        return this.records;
+    }
+
 }

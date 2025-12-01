@@ -4,7 +4,7 @@ import { IObserver } from './IObserver';
 import { ISubject } from './ISubject';
 import { WorkState, ITaskCompletion } from '../Model/WorkState';
 import { AionEventEmitter } from '../Events/AionEventEmitter';
-import { IEvent } from '../Events/IEvent';
+import { IEvent, EventType } from '../Events/IEvent';
 
 export class ProfessionalObserver implements IObserver {
   
@@ -19,7 +19,7 @@ export class ProfessionalObserver implements IObserver {
       // Emitir un evento de auditoría profesional usando el emisor AION
       AionEventEmitter.getInstance().emit(
         'ProfessionalObserver', // source
-        'audit', // type
+        EventType.Audit, // type
         { // payload
           message: `Rendimiento profesional auditado.`,
           taskId: lastTask.taskId,

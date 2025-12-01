@@ -4,7 +4,12 @@
  * Define el Contrato de Coherencia para cualquier evento auditable en AION.
  * Este debe reflejar los campos obligatorios de events_schema.json.
  */
-export type EventType = 'metric' | 'audit' | 'state' | 'command';
+export enum EventType {
+    Metric = 'metric',
+    Audit = 'audit',
+    State = 'state',
+    Command = 'command',
+}
 
 export interface IEvent {
     // 1. Campo de Determinismo

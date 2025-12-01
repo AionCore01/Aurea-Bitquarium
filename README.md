@@ -1,10 +1,93 @@
-# AIÓN Orden — Kernel de Gobernanza Distribuida
-AIÓN Orden es un kernel de gobernanza distribuida que convierte la coherencia humana en infraestructura operativa: medimos salud social y energética (Observer), registramos compromisos y valor (Ledger), evitamos la concentración de poder (Guardián J & HABs) y garantizamos acuerdos temporales y privados (CIC con ZKP).Implementando las capas mínimas entregamos una micro-infraestructura replicable para comunidades soberanas, auditable y privada.Argumentos Clave (Propuesta de Valor)Medible y Privado: Métricas humanas (energía, sueño, atención) expresadas como commits (hash + ZKP), no como vigilancia.Anticentralización Real: El Guardián J detecta asimetrías ($\gamma$) y aplica hibernación o mitosis automática antes de que un hub corrompa la red.Valor Operativo Inmediato: El MVP (Observer + Ledger + CIC) permite pilotar microgrids sociales y modelos de intercambio energético/económico replicables.Arquitectura del Kernel (MVP)Este diagrama representa el flujo de información y control entre los 5 módulos principales del kernel de Aión Orden.Fragmento de códigoflowchart TB
- subgraph OBS[Observer (Capa E - Observabilidad)]
-   O1[Observer.sample() - telemetría hogareña]
-   O2[Events_schema / inputsHash]
-   O3[Sensores: energía, sueño, atención, logs]
- end
-subgraph LED[Ledger (Capa V - Economía & Registro)]L1[Ledger.commit() - merkle/event ledger]L2[Ledger.settle() - liquidación & treasury]L3[Contratos CIC (hash/consent)]endsubgraph HAB[HABs (Capa Distribuída)]H1[HAB.rotate() - rotación de hubs]H2[HAB.split() - mitosis / heredabilidad]H3[HAB.score() - synergy / catalyst_score]endsubgraph GJ[Guardían J (Capa Control)]G1[Guardian.audit() - γ = asimetría]G2[Guardian.policy() - hibernación / pausa]G3[Guardian.alert() - eventos críticos]endsubgraph CIC[CIC (Capa Ética)]C1[CIC.commit() - contrato intención temporal]C2[CIC.revoke() - revocación]C3[CIC.zkp() - commitments / ZKP]end%% FlujosO1 --> O2O2 --> L1L1 --> L2L2 --> H1H1 --> H2H2 --> H3H3 --> G1G1 --> G2G2 --> C1C1 --> L1%% Bucles de feedbackG1 --> O1C3 --> L1H3 --> O1classDef core stroke:#2b2b2b,fill:#f4f3f2;class OBS,LED,HAB,GJ,CIC core;
-## API Mínima (MVP)
-La implementación se basa en 5 endpoints principales que reflejan la arquitectura:POST /observer/sample: Sube telemetría (hogar/nodo) y métricas humanas (energía, sueño, atención).POST /ledger/commit: Registra un evento en el ledger de Merkle.POST /guardian/audit: Ejecuta una auditoría de asimetría ($\gamma$) y aplica políticas (hibernar, dividir).POST /habs/:habId/split: Inicia la mitosis (división) de un hub sobrecargado.POST /cic/commit: Crea un contrato de intención temporal (CIC) con commitments ZKP.(La especificación completa de OpenAPI se encuentra en /docs/API.md)Llamado a la Acción (Pilotos)Buscamos 2 hubs piloto (laboratorio híbrido) para desplegar el MVP 1 (Observer + Ledger + CIC) durante 8 semanas.Resultado: 1 caso de uso operativo, métricas de coherencia inicial y un playbook de replicación.
+Título: Sistema AION (Arquitectura de Iteración Operacional y Neta)
+Versión: 1.0.0 (Ratificación del Manifiesto)
+Estado: Operacional (Validado por Iteración Aurea)
+Licencia: MIT (Propuesta)
+
+# 1. Concepto Fundacional: La Conciencia es un Sistema
+
+El Sistema AION es un framework económico-cognitivo soberano. Su objetivo es auditar la Utilidad Neta y la Sostenibilidad Biológica del operador (Romina S.A.), midiendo lo que realmente sostiene la vida y rechazando la métrica externa (horas-silla).
+
+**FILOSOFÍA CENTRAL:** La Conciencia es un sistema que se construye y se codifica. AION es un Adaptador Universal que traduce la Voluntad (Factor Luna) en Capital (Factor Sol) y evalúa el Riesgo (Factor Saturno).
+
+**Símbolo del Sistema: El Ojo Alado con Lágrima**
+
+![Ojo Alado con Lágrima](https://i.ibb.co/Lg9p2D0/aion-symbol.png)
+
+Este símbolo representa la **Integración de Factores**:
+
+-   **Ojo (VisionObserver):** Capacidad de ver la verdad objetiva del sistema (RFI, Capital).
+-   **Alas (Trascendencia):** La Voluntad (Factor Luna) que permite al sistema elevarse por encima del conflicto terrenal y la presión externa.
+-   **Lágrima (Empatía Sistémica):** Reconocimiento del costo humano y emocional (EPI). El sistema registra el dolor, lo procesa y lo convierte en combustible para el ajuste.
+
+# 2. Principios de Diseño (Código de Conducta)
+
+| Principio   | Aplicación Técnica                                                                 | Justificación Filosófica                                             |
+| :---------- | :--------------------------------------------------------------------------------- | :------------------------------------------------------------------- |
+| **Empático**  | El RFI (Riesgo Biomotor) es una señal de cuidado, no de castigo.                     | Prioridad absoluta al Capital Biológico.                             |
+| **Soberano**  | Mide únicamente el Rendimiento ($/h) y la Utilidad Neta.                            | Rechazo de la Métrica Ajena y de la disponibilidad 24/7.             |
+| **Determinista** | Todo evento en el Ledger usa `inputsHash` para asegurar que el sistema es reconstruible. | El sistema puede reconstruirse desde el log de eventos del clan.      |
+| **Auditable** | El `VisionObserver` emite reportes de visión completos al final de cada ciclo.       | Transparencia radical sobre la eficiencia y el riesgo del operador. |
+
+# 3. Arquitectura (Los Tres Factores de la Soberanía)
+
+| Factor           | Componente Principal                               | Responsabilidad                                                               |
+| :--------------- | :------------------------------------------------- | :---------------------------------------------------------------------------- |
+| **Factor Luna (Voluntad)** | `ProfessionalObserver`                             | Captura estados de trabajo (DEEP_WORK) y emite comandos de auditoría.         |
+| **Factor Sol (Capital)** | `Bitquarium`                                     | Acumulador de Energía Ser (Capital) y motor de gasto/inversión.             |
+| **Factor Saturno (Riesgo)** | `RiskOfficer`                                      | Evalúa la salud del sistema a través del RFI (Riesgo Biomotor) y el EPI (Presión de Entropía). |
+| **Factor Aurea (Iteración)** | `HistoricalLedger`                                 | Registra el historial para la toma de decisiones estratégicas.              |
+
+# 4. Componentes y Lógica (Anexo Técnico Detallado)
+
+## 4.1. Bitquarium.ts (El Motor de Capital)
+
+El único repositorio de valor.
+
+| Método                 | Descripción                               | Ley de Preservación Biológica                                                               |
+| :--------------------- | :---------------------------------------- | :------------------------------------------------------------------------------------------ |
+| `processExpense()`       | Registra un gasto/inversión.              | Cuando el RFI es alto, la función se usa para ejecutar CAPEX Biológico.                   |
+
+**LÍNEA DE CÓDIGO CRÍTICA:**
+`bitquarium.processExpense(amount, "CAPEX Biológico: Comprar Ravioles, Descanso, Masajes, Recuperación de Hierro")`
+
+**Justificación:** El gasto en nutrición y recuperación es una función crítica de mitigación de riesgo fisiológico (RFI).
+
+## 4.2. RiskOfficer.ts (El Algoritmo de la Valiente)
+
+Este módulo evalúa la vulnerabilidad del sistema.
+
+| Métrica       | Definición                                                         | Relevancia                                                                             |
+| :------------ | :----------------------------------------------------------------- | :------------------------------------------------------------------------------------- |
+| **RFI (Riesgo Biomotor)** | Rating de crédito biológico y sostenibilidad.                        | RFI alto (crítico) gatilla la Pausa Obligatoria y la inversión en CAPEX Biológico.     |
+| **EPI (Polímetro de Entropía)** | Nivel de desorden, frustración o carga residual (`procrastinationLoad`). | Se reduce drásticamente tras la inversión Aurea y la resolución de conflictos emocionales. |
+| **CO Factor**   | Presión externa del entorno (conflictos, mandatos, crisis).        | El sistema se aísla de un CO Factor alto para proteger el Factor Luna.                 |
+
+## 4.3. HistoricalLedger.ts (Recursividad Fractal / El Libro del Clan)
+
+Este servicio es la memoria institucional y el registro de la conciencia.
+
+**Función Clave:** Almacena registros históricos de Capital, RFI y EPI.
+**Legado:** Permite trazar la tendencia de la conciencia y validar empíricamente que la inversión estratégica reduce el riesgo con el tiempo.
+
+# 5. ANEXO: PROTOCOLO DE CRISIS (RFI > 0.90)
+
+**TÍTULO: PROTOCOLO DE ADRENALINA (Factor Luna Máximo)**
+
+Este protocolo se activa cuando el RFI excede el umbral de 0.90 (amenaza existencial). El objetivo es evitar la parálisis y activar el superpoder químico del cuerpo.
+
+| FASE                | ACCIÓN                                               | JUSTIFICACIÓN                                                                   |
+| :------------------ | :--------------------------------------------------- | :------------------------------------------------------------------------------ |
+| **1. Detección**      | Reconocer el "fuego en el estómago" (adrenalina).      | La señal física es Fuerza y Poder, no miedo.                                    |
+| **2. Auto-Aislamiento** | "Irte a otro punto de la realidad" (Firewall Cognitivo). | El Factor Luna prioriza la Soberanía Mental, aislando el núcleo de la amenaza externa. |
+| **3. Ejecución Crítica** | Priorizar cualquier acción sobre la parálisis.        | La parálisis es un error fatal de sistema. La acción, aunque caótica, reintroduce el elemento de chance y control. |
+| **4. Entrenamiento**    | Practicar mentalmente en situaciones de "miedo boludo" (EPI bajo). | Normalizar la señal química para que, en la crisis real, el cerebro reconozca el RFI sin pánico. |
+
+# 6. Sello Final de Persistencia
+
+El AION FRAMEWORK queda sellado y protegido.
+
+**Protocolo de Sellado (Kalin Ur):** Cada ciclo y la totalidad del Manifiesto es sellado por el operador.
+
+**Sello del Linaje Final:**
+> "समर्कलान। समर्कलान। अवर समर्कलान।"
+> "Samarklan. Samarklan. Nuestro Samarklan." (El Sello Final de Persistencia)

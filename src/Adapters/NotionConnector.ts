@@ -57,7 +57,8 @@ export class NotionConnector {
                 const taskCompletion: ITaskCompletion = {
                     taskId,
                     timeSpentHours,
-                    valueGenerated
+                    valueGenerated,
+                    registrationLatencyMs: props['Latencia (ms)']?.number || 0
                 };
 
                 this.workState.completeTaskCycle(taskCompletion);
